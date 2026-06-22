@@ -1,63 +1,65 @@
 # CIR · Construction Inspection Register
 
-CIR is a Windows desktop application for construction inspection teams. It keeps prescriptions, remarks, deadlines, attachments, audit history, and contractor exchange packages in a local/server-folder workflow without requiring a separate web server.
+CIR — desktop-приложение для Windows, предназначенное для ведения журнала строительного контроля: объектов, предписаний, замечаний, сроков, вложений, аудита изменений и обмена данными с подрядчиками.
 
-The primary storage is SQLite. Excel is generated as a secondary export for Power BI, Power Query, and external reporting.
+Приложение работает в локальной/офисной файловой схеме и не требует отдельного сервера. Основное хранилище данных — SQLite. Excel создается как вторичная выгрузка для Power BI, Power Query и внешней отчетности.
 
-## Features
+## Возможности
 
-- Desktop GUI built with Python `tkinter/ttk`.
-- SQLite storage per work profile in a shared server folder.
-- Roles for construction control specialist, supervisor, and substitute user.
-- Supervisor mode reads SQLite profiles directly.
-- Profile locking to reduce accidental simultaneous editing conflicts.
-- Audit log for create/update/delete/import actions.
-- Excel export with objects, prescriptions, remarks, imported packages, and audit log sheets.
-- Remark and prescription attachment folders.
-- Contractor exchange through `.cirx` packages suitable for email transfer.
-- Demo server for testing and demonstration.
+- Графический интерфейс на Python `tkinter/ttk`.
+- Хранение данных в SQLite по каждому рабочему профилю.
+- Общая серверная папка для профилей сотрудников.
+- Роли: сотрудник стройконтроля, руководитель, замещающий пользователь.
+- Режим руководителя читает данные напрямую из SQLite-профилей.
+- Файловая блокировка профиля для снижения риска одновременного редактирования.
+- Журнал аудита для создания, изменения, удаления и импорта данных.
+- Excel-выгрузка с листами объектов, предписаний, замечаний, импортированных пакетов и аудита.
+- Папки вложений для предписаний и замечаний.
+- Обмен с подрядчиками через `.cirx`-пакеты, удобные для передачи по почте.
+- Демо-сервер для тестирования и демонстрации.
 
-## Repository Contents
+## Состав репозитория
 
 ```text
-cir_app/                     application source code
-cir_app/assets/              application icon
-scripts/                     smoke test, demo generation, EXE build
-generated_demo_server_data/  canonical demo server data
-main.py                      application entry point
-requirements.txt             runtime dependency list
-README.md                    project documentation
+cir_app/                     исходный код приложения
+cir_app/assets/              иконка приложения
+scripts/                     smoke-тест, генерация демо, сборка EXE
+generated_demo_server_data/  эталонный демо-сервер
+main.py                      точка запуска приложения
+requirements.txt             список зависимостей
+README.md                    документация проекта
+LICENSE                      лицензия
 ```
 
-Generated builds, local configuration, live work databases, attachments, and exchange packages are intentionally ignored by Git.
+Сборки, локальные настройки, рабочие базы, реальные вложения и пакеты обмена намеренно исключены из Git через `.gitignore`.
 
-## Requirements
+## Требования
 
 - Windows 10/11
-- Python 3.11 or newer
+- Python 3.11 или новее
 
-Install dependencies:
+Установка зависимостей:
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
 
-## Run From Source
+## Запуск из исходного кода
 
 ```powershell
 python main.py
 ```
 
-On first launch, CIR asks for:
+При первом запуске CIR попросит указать:
 
-- server folder, where profiles and SQLite databases are stored;
-- user name;
-- user code;
-- role.
+- серверную папку, где будут храниться профили и SQLite-базы;
+- имя пользователя;
+- код пользователя;
+- роль.
 
-The selected server folder is the application's data repository. Do not point it at the Git source repository unless you intentionally want test data there.
+Выбранная серверная папка является рабочим хранилищем данных приложения. Не указывайте в качестве серверной папки сам Git-репозиторий, если только вы осознанно не хотите создавать там тестовые данные.
 
-## Server Folder Structure
+## Структура серверной папки
 
 ```text
 server_data/
@@ -70,65 +72,65 @@ server_data/
       attachments/
 ```
 
-`cir.sqlite` is the source of truth. `export.xlsx` is recreated after data changes and is intended for Power BI/Power Query integration.
+`cir.sqlite` — основной источник данных. `export.xlsx` пересоздается после изменений и используется для интеграции с Power BI / Power Query.
 
-## Demo Data
+## Демо-данные
 
-The repository includes one canonical demo server:
+В репозитории есть один эталонный демо-сервер:
 
 ```text
 generated_demo_server_data/
 ```
 
-In the application settings, the "Демо-данные" button adds demo objects, prescriptions, and remarks to the currently selected server folder/profile. The button is disabled until a server folder is specified and cannot be used in supervisor/read-only mode.
+В настройках приложения кнопка `Демо-данные` добавляет демо-объекты, предписания и замечания в текущую выбранную серверную папку/профиль. Кнопка недоступна, пока не указана серверная папка, и не работает в режиме руководителя или только чтения.
 
-If the current profile already contains data, CIR shows a large warning before adding demo data because repeated use will add extra demo projects and modify the selected data repository.
+Если в текущем профиле уже есть данные, CIR покажет крупное предупреждение перед добавлением демо-данных. Повторное добавление демо-данных создаст дополнительные демо-проекты и изменит выбранное рабочее хранилище.
 
-To regenerate the canonical demo server:
+Перегенерировать эталонный демо-сервер можно командой:
 
 ```powershell
 python -B scripts\generate_demo_profiles.py --force
 ```
 
-Without `--force`, the script refuses to overwrite an existing demo server and does not create extra numbered folders.
+Без флага `--force` скрипт не перезаписывает существующий демо-сервер и не создает дополнительные папки вида `_2`, `_3`.
 
-## Contractor Exchange
+## Обмен с подрядчиками
 
-CIR supports file-based exchange with subcontractors:
+CIR поддерживает файловый обмен с субподрядными организациями:
 
-1. The office exports an assignment package as `.cirx`.
-2. The subcontractor imports the package into their local CIR instance.
-3. The subcontractor updates remarks and attaches remark photos.
-4. The subcontractor exports a response `.cirx` package.
-5. The office imports the response package back into the project.
+1. Офис экспортирует пакет-задание в формате `.cirx`.
+2. Подрядчик импортирует пакет в свою локальную копию CIR.
+3. Подрядчик обновляет замечания и прикладывает фотографии по замечаниям.
+4. Подрядчик экспортирует ответный `.cirx`-пакет.
+5. Офис импортирует ответный пакет обратно в проект.
 
-The package format is intended for email transfer. Attachments are included primarily for remarks, where photo evidence matters most.
+Формат `.cirx` рассчитан на передачу по электронной почте. Вложения в первую очередь используются для замечаний, где важна фотофиксация устранения.
 
-## Smoke Test
+## Проверка без GUI
 
-Run a non-GUI verification:
+Запуск smoke-теста:
 
 ```powershell
 python -B scripts\smoke_test.py
 ```
 
-The smoke test checks SQLite storage, Excel export, audit log, locking behavior, contractor exchange, duplicate package protection, and attachment import.
+Smoke-тест проверяет SQLite-хранилище, Excel-выгрузку, аудит, блокировки, обмен с подрядчиком, защиту от повторного импорта пакета и импорт вложений.
 
-## Build EXE
+## Сборка EXE
 
-Build a single developer EXE:
+Сборка одиночного developer EXE:
 
 ```powershell
 python -B scripts\build_exe.py --clean
 ```
 
-Build release artifacts:
+Сборка релизных артефактов:
 
 ```powershell
 python -B scripts\build_release.py --version v3 --clean
 ```
 
-The release build writes:
+Релизная сборка создает:
 
 ```text
 dist/v3/CIR-v3-portable/
@@ -137,26 +139,26 @@ dist/v3/CIR-v3-full.exe
 dist/v3/CIR-v3-Setup.exe
 ```
 
-Publish ready-made ZIP/EXE builds through GitHub Releases rather than committing `dist/` to the repository.
+Готовые ZIP/EXE-файлы лучше публиковать через GitHub Releases, а не коммитить в репозиторий.
 
-## GitHub Hygiene
+## Правила публикации на GitHub
 
-Commit source code, scripts, documentation, and the canonical demo server only.
+В репозиторий следует коммитить только исходный код, скрипты, документацию и эталонный демо-сервер.
 
-Do not commit:
+Не коммитить:
 
 - `build/`
 - `dist/`
 - `.cir_app_config.json`
-- live `server_data/`
-- real `profiles/`
-- production `cir.sqlite`
-- attachments from real projects
-- `.cirx` exchange packages
-- lock and SQLite WAL/SHM files
+- рабочую папку `server_data/`
+- реальные `profiles/`
+- рабочие базы `cir.sqlite`
+- вложения реальных проектов
+- `.cirx`-пакеты обмена
+- lock-файлы и SQLite WAL/SHM-файлы
 
-For a public repository, review demo data and remove any real project names, contractor names, comments, or photos before publishing.
+Перед публикацией публичного репозитория нужно проверить демо-данные и удалить любые реальные названия проектов, подрядчиков, комментарии или фотографии.
 
-## License
+## Лицензия
 
-MIT License. See [LICENSE](LICENSE).
+MIT License. См. [LICENSE](LICENSE).
